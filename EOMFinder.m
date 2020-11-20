@@ -2,17 +2,17 @@ function [B,C,G] = EOMFinder(Arm,Im,Il,Mm,Ml,J,k,g0)
 %{
 Inputs:
 Arm: the Serial Link form of the robotic arm in question
-Im: the 3x3xn matrix of motor inertias
-Il: the 3x3xn matrix of link inertias
-Mm: the nx1 matrix of motor masses
-Ml: the nx1 matrix of link masses
-J: the 1xn vector of joint types (0 is rev 1 is pris)
-k: the nx1 vector of gear ratios
-g0: the 3x1 vector of gravity with magnitude equal to gravitational acceleration (norm(g0)=9.81 on earth)
+Im: the N x 1 vector of motor inertias
+Il: the 1 x N cell arry of link inertias (Il{i} is a 3 x 3 matrix)
+Mm: the N x 1 vector of motor masses
+Ml: the N x 1 vector of link masses
+J: the 1 x N vector of joint types (0 is rev 1 is pris)
+k: the N x 1 vector of gear ratios
+g0: the 3 x 1 vector of gravity with magnitude equal to gravitational acceleration (norm(g0)=9.81 on earth)
 Outputs:
-B: the nxn matrix of inertial effects
-C: the nxn matrix of centrifugal and coriolis effects
-G: the nx1 matrix of gravity effects
+B: the n x n matrix of inertial effects
+C: the n x n matrix of centrifugal and coriolis effects
+G: the n x 1 matrix of gravity effects
 %}
 %% Setup
 [q,qd,qdd]=Arm.gencoords;
@@ -20,9 +20,12 @@ assume(q,'real');
 assume(qd,'real');
 assume(qdd,'real');
 n=Arm.n;
-%Get DH parameters
-a=Arm.a;
-alpha=Arm.alpha;
+%Get DH parameters and offset
+% a=Arm.a;
+% alpha=Arm.alpha;
+% theta = Arm.theta;
+% d = Arm.d;
+% offset = Arm.offset;
 for i=1:n
     if J(i)==0
         d(i)=Arm.d(i);
@@ -34,7 +37,7 @@ for i=1:n
 end
 %Get T symbolically
 for i=i:n
-    T{i}=Tfinder(a(i),alpha(i),d(i),theta(i);
+    T{i}=Tfinder(a(i),alpha(i),d(i),theta(i));
     T0i{i}=eye(4);
     for j=1:i
         T0i{i}=T0i{i}*T{j};
@@ -87,10 +90,10 @@ end
 for i=1:n
     Jom{i}=zeros(3,n);
     for j=1:i
-        if j<i
+        if j == i
             Joj{i}(:,j)=Jol{i}(:,j);
         else
-            zm=Toi{i-1}(1:3,3);
+            zm=T0i{i-1}(1:3,3);
             Joj{i}(:,j)=k(i)*zm;
         end
     end
@@ -99,12 +102,12 @@ end
 B=zeros(n,n);
 for i=1:n
     B=B+Ml(i)*Jpl{i}'*Jpl;
-    B=B+Jol{i}'*Toi{i}(1:3,1:3)*Il(i)*Toi{i}(1:3,1:3)'*Jol{i};
+    B=B+Jol{i}'*T0i{i}(1:3,1:3)*Il(i)*T0i{i}(1:3,1:3)'*Jol{i};
     B=B+Mm(i)*Jpm{i}'*Jpm{i};
     if i==1
         B=B+Jom{i}'*Im{i}*Jom{i};
     else
-        B=B+Jom{i}'*Toi{i-1}(1:3,1:3)*Im(i)*Toi{i-1}(1:3,1:3)'*Jom{i};
+        B=B+Jom{i}'*T0i{i-1}(1:3,1:3)*Im(i)*T0i{i-1}(1:3,1:3)'*Jom{i};
     end
 end
 %% Calculate C
@@ -137,4 +140,3 @@ T=[cos(theta),-sin(theta)*cos(alpha),sin(theta)*sin(alpha),a*cos(theta);
     0,0,0,1];
 end
 end
-
