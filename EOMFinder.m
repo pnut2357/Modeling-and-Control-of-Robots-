@@ -15,6 +15,7 @@ C: the n x n matrix of centrifugal and coriolis effects
 G: the n x 1 matrix of gravity effects
 %}
 %% Setup
+format long
 [q,qd,qdd]=Arm.gencoords;
 assume(q,'real');
 assume(qd,'real');
@@ -50,6 +51,8 @@ for i=1:n
 end
 %% Find JPL, JOL
 for i=1:n
+    Jpl{i}=sym(zeros(3,n));
+    Jol{i}=sym(zeros(3,n));
     for j=1:i
         if j==1
             zj1=[0 0 1];
@@ -61,20 +64,15 @@ for i=1:n
             pl=(T0i{i}(1:3,4)-T0i{j-1}(1:3,4))/2;
         end
         if J(j)==0
-            Jpln{i}(:,j)=cross(zj1,(pl-pj1'))';
-            Joln{i}(:,j)=zj1;
+            Jpl{i}(:,j)=cross(zj1,(pl-pj1'))';
+            Jol{i}(:,j)=zj1';
         else
-            Jpln{i}(:,j)=zj1;
-            Joln{i}(:,j)=[0;0;0];
+            Jpl{i}(:,j)=zj1;
+            Jol{i}(:,j)=[0;0;0];
         end
     end
 end
-for i=1:n
-    Jpl{i}=sym(zeros(3,n));
-    Jol{i}=sym(zeros(3,n));
-    Jpl{i}(:,1:i)=Jpl{i}(:,1:i)+Jpln{i};
-    Jol{i}(:,1:i)=Jol{i}(:,1:i)+Jpln{i};
-end
+
 %% Find JPM
 for i=1:n
     Jpm{i}=sym(zeros(3,n));
@@ -133,14 +131,16 @@ for i=1:n
         end
     end
 end
+C=simplify(C);
 %% Calculate G
-G=zeros(n,1);
+G=sym(zeros(n,1));
 for i=1:n
     for j=1:n
         G(i)=G(i)-Ml(j)*g0'*Jpl{j}(:,i);
         G(i)=G(i)-Mm(j)*g0'*Jpm{j}(:,i);
     end
 end
+G=simplify(G);
 %%Functions
 %Find Ti-1,i
 function [T] = Tfinder(a,alpha,d,theta)
