@@ -1,4 +1,4 @@
-function [B,C,G] = EOMFinder(Arm,Im,Il,Mm,Ml,J,k,g0)
+function [B,C,G] = EOMFinder(Arm,Im,Il,Mm,Ml,J,k,g0,dh_syms)
 %{
 Inputs:
 Arm: the Serial Link form of the robotic arm in question
@@ -9,6 +9,8 @@ Ml: the N x 1 vector of link masses
 J: the 1 x N vector of joint types (0 is rev 1 is pris)
 k: the N x 1 vector of gear ratios
 g0: the 3 x 1 vector of gravity with magnitude equal to gravitational acceleration (norm(g0)=9.81 on earth)
+% dh_syms: the N x 4 matrix of symbolic dh parameters (numbers)
+
 Outputs:
 B: the n x n matrix of inertial effects
 C: the n x n matrix of centrifugal and coriolis effects
@@ -22,11 +24,11 @@ assume(qd,'real');
 assume(qdd,'real');
 n=Arm.n;
 %Get DH parameters and offset
-a=Arm.a;
-alpha=Arm.alpha;
+a=(dh_syms(:,3))';
+alpha=(dh_syms(:,4))';
 %theta = Arm.theta;
 %d = Arm.d;
-offset = Arm.offset;
+offset = sym(Arm.offset);
 for i=1:n
     if J(i)==0
         theta(i)=q(i)+offset(i);
