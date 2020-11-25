@@ -1,4 +1,4 @@
-function [B,C,G] = EOMFinder(Arm,Im,Il,Mm,Ml,J,k,g0,dh_syms)
+function [B,C,G,Je] = EOMFinder(Arm,Im,Il,Mm,Ml,J,k,g0,dh_syms)
 %{
 Inputs:
 Arm: the Serial Link form of the robotic arm in question
@@ -9,12 +9,15 @@ Ml: the N x 1 vector of link masses
 J: the 1 x N vector of joint types (0 is rev 1 is pris)
 k: the N x 1 vector of gear ratios
 g0: the 3 x 1 vector of gravity with magnitude equal to gravitational acceleration (norm(g0)=9.81 on earth)
-% dh_syms: the N x 4 matrix of symbolic dh parameters (numbers)
+dh_syms: the N x 4 matrix of symbolic dh parameters (numbers)
 
 Outputs:
 B: the n x n matrix of inertial effects
 C: the n x n matrix of centrifugal and coriolis effects
 G: the n x 1 matrix of gravity effects
+Fpos: the n x 1 matrix of friction coefficients when qdot is positive
+Fneg: the n x 1 matrix of friction coefficients when qdot is negative
+Je: The 6 x n geometric jacobian
 %}
 %% Setup
 format long
@@ -59,7 +62,7 @@ for i=1:n
         if j==1
             zj1=[0 0 1];
             pj1=[0 0 0];
-            pl=T0i{1}(1:3,4)/2;
+            pl=T0i{i}(1:3,4)/2;
         else
             zj1=T0i{j-1}(1:3,3);
             pj1=T0i{j-1}(1:3,4)';
@@ -78,15 +81,18 @@ end
 %% Find JPM
 for i=1:n
     Jpm{i}=sym(zeros(3,n));
-    for j=1:i
+    for j=1:i-1
         if j==1
             zj1=[0 0 1];
-            pj1=[0 0 0];
-            pm=[0 0 0];
+            pj1=[0 0 0]';
         else
             zj1=T0i{j-1}(1:3,3);
             pj1=T0i{j-1}(1:3,4);
-            pm=T0i{i}(1:3,4);
+        end
+        if i==1
+            pm=[0 0 0];
+        else
+            pm=T0i{i-1}(1:3,4);
         end
         if J(j)==0
             Jpm{i}(:,j)=cross(zj1,(pm-pj1));
@@ -97,13 +103,17 @@ for i=1:n
 end
 %% Find JOM
 for i=1:n
-    Jom{i}=zeros(3,n);
+    Jom{i}=sym(zeros(3,n));
     for j=1:i
-        if j == i
-            Joj{i}(:,j)=Jol{i}(:,j);
+        if j < i
+            Jom{i}(:,j)=Jol{i}(:,j);
         else
-            zm=T0i{i-1}(1:3,3);
-            Joj{i}(:,j)=k(i)*zm;
+            if i==1
+                zm=[0 0 1]';
+            else
+                zm=T0i{i-1}(1:3,3);
+            end
+            Jom{i}(:,j)=k(i)*zm;
         end
     end
 end
@@ -151,4 +161,31 @@ T=[cos(theta),-sin(theta)*cos(alpha),sin(theta)*sin(alpha),a*cos(theta);
     0,sin(alpha),cos(alpha),d;
     0,0,0,1];
 end
+%% Calculate F: NEEDS TO BE DOUBLE CHECKED BASED ON HOW INPUTS LOOK
+%{
+Fc=Arm.Tc;
+Fb=Arm.B.*abs(qd);
+Fpos=Fc(:,1)+Fb;
+Fneg=Fc(:,2)-Fb;
+%}
+%% Calculate Je
+Je=sym(zeros(6,n));
+for i=1:n
+    if i==1
+        zi1=[0 0 1]';
+        Pi1=[0 0 0]';
+    else
+        zi1=T0i{i-1}(1:3,3);
+        Pi1=T0i{i-1}(1:3,4);
+    end
+    pe=T0i{n}(1:3,4);
+    if J(i)==0
+        Je(1:3,i)=cross(zi1,(pe-Pi1));
+        Je(4:6,i)=zi1;
+    else
+        Je(1:3,i)=zi1;
+    end
+end
+Je=simplify(Je);
+%% Full EOM
 end
