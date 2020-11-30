@@ -1,4 +1,4 @@
-function [xe] = compliance_control(he,xd,Arm,Im,Il,Mm,Ml,J,k,g0eom,dh_syms,t0, tf)
+function [xe] = compliance_control(he,xd,Arm,Im,Il,Mm,Ml,J,k,g0eom,dh_syms,t0, tf, FB, Fpos, Fneg)
 %{
 Inputs:
 Special inputs:
@@ -24,7 +24,19 @@ G: the n x 1 matrix of gravity effects
 %}
 %dh_syms
 [B,C,G] = EOMFinder(Arm,Im,Il,Mm,Ml,J,k,g0eom,dh_syms);
+n=size(B,1);
+q0=zeros(n,1);
+q0
 
+%initialize q and dq
+q = Simulink.Signal;
+q.CoderInfo.StorageClass = 'ExportedGlobal';
+q.InitialValue = 'q0'
+dq = Simulink.Signal;
+dq.CoderInfo.StorageClass = 'ExportedGlobal';
+dq.InitialValue = 'q0'
+q=zeros(n,1);
+dq=zeros(n,1);
 %dh_calc: the N x 1 matrix of symbolic dh parameters (numbers)
 sym dh_calc
 dh_calc = dh_syms(:);

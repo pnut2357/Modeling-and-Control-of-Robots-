@@ -1,7 +1,7 @@
 function xe = ArmFinder(dh_calc, q, J)
 %evaluates symbolic Arm for a certain q
  % Create a Link object for this link
- i=size(q,1);
+ i=size(dh_calc,1);
 a=dh_calc(:,1)';
 alpha=dh_calc(:,2)';
 d=dh_calc(:,3)';
@@ -14,7 +14,6 @@ theta=dh_calc(:,4)';
      end        
  end
 Arm=SerialLink(L);
-T=vpa(Arm.fkine(q));
 
 %ZYZ Euler angles
 eul=tr2eul(T);
