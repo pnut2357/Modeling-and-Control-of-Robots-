@@ -1,6 +1,6 @@
 function [B] = BFinder(Bq, q)
 % Getting B
-s=size(q, 2);
+s=size(Bq,1);
 if s=1
     BQ=subs(Bq, q1, q(1));
 end

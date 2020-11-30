@@ -1,6 +1,6 @@
 function [G] = GFinder(Gq, q)
 % Getting G
-s=size(q, 2);
+s=size(q, 1);
 if s=1
     GQ=subs(Gq, q1, q(1));
 end

@@ -23,10 +23,13 @@ C: the n x n matrix of centrifugal and coriolis effects
 G: the n x 1 matrix of gravity effects
 %}
 %dh_syms
+%clc; clear all; close all;
+
 [B,C,G] = EOMFinder(Arm,Im,Il,Mm,Ml,J,k,g0eom,dh_syms);
+q0=Initial_cond_q(B);
+global B;
 n=size(B,1);
-q0=zeros(n,1);
-q0
+assert (n <= 20);
 
 %initialize q and dq
 q = Simulink.Signal;
@@ -35,8 +38,11 @@ q.InitialValue = 'q0'
 dq = Simulink.Signal;
 dq.CoderInfo.StorageClass = 'ExportedGlobal';
 dq.InitialValue = 'q0'
-q=zeros(n,1);
-dq=zeros(n,1);
+% global q;
+% global dq;
+% q=zeros(n,1);
+% dq=zeros(n,1);
+
 %dh_calc: the N x 1 matrix of symbolic dh parameters (numbers)
 sym dh_calc
 dh_calc = dh_syms(:);

@@ -1,6 +1,6 @@
 function [C] = CFinder(Cq, q, dq)
 % Getting C
-s=size(q, 2);
+s=size(q, 1);
 if s=1
     CQ=subs(Cq, q1, q(1));
 end
