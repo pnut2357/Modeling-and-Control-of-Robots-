@@ -16,7 +16,7 @@ theta=dh_calc(:,4)';
 Arm=SerialLink(L);
 
 %calculate geometric Jacobian
-J=Arm.jacob0(q.');
+J=Arm.jacob0(q');
 
 %evaluate he for certain t
 he_calc=eval(subs(he, t, t));
