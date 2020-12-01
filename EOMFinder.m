@@ -1,4 +1,4 @@
-function [B,C,G,Je, Arm] = EOMFinder(Arm,Im,Il,Mm,Ml,J,k,g0,dh_syms)
+function [B,C,G,Je,Fpos,Fneg,Arm,Full_EOMpos,Full_EOMneg] = EOMFinder(Arm,Im,Il,Mm,Ml,J,k,g0,dh_syms,he)
 %{
 Inputs:
 Arm: the Serial Link form of the robotic arm in question
@@ -10,6 +10,7 @@ J: the 1 x N vector of joint types (0 is rev 1 is pris)
 k: the N x 1 vector of gear ratios
 g0: the 3 x 1 vector of gravity with magnitude equal to gravitational acceleration (norm(g0)=9.81 on earth)
 dh_syms: the N x 4 matrix of symbolic dh parameters (numbers)
+he: the 6x1 symbolic external forces
 Outputs:
 B: the n x n matrix of inertial effects
 C: the n x n matrix of centrifugal and coriolis effects
@@ -161,12 +162,11 @@ T=[cos(theta),-sin(theta)*cos(alpha),sin(theta)*sin(alpha),a*cos(theta);
     0,0,0,1];
 end
 %% Calculate F: NEEDS TO BE DOUBLE CHECKED BASED ON HOW INPUTS LOOK
-%{
+
 Fc=Arm.Tc;
 Fb=Arm.B.*abs(qd);
 Fpos=Fc(:,1)+Fb;
 Fneg=Fc(:,2)-Fb;
-%}
 %% Calculate Je
 Je=sym(zeros(6,n));
 for i=1:n
@@ -187,4 +187,11 @@ for i=1:n
 end
 Je=simplify(Je);
 %% Full EOM
+
+disp('For positive Joint velocities')
+disp('u=')
+Full_EOMpos=B*qdd+C*qd+Fpos*qd+G+Je'*he
+disp('For negative Joint velocities')
+disp('u=')
+Full_EOMneg=B*qdd+C*qd+Fneg*qd+G+Je'*he
 end
