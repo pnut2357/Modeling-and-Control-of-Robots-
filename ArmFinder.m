@@ -15,12 +15,13 @@ theta=dh_calc(:,4)';
  end
 Arm=SerialLink(L);
 
+T=Arm.fkine(q);
 %ZYZ Euler angles
-eul=tr2eul(T);
+rpy=tr2rpy(T);
 
 %xe: 6 x 1 vector of actual 6-DOF arm position
 xe=zeros(6, 1);
-xe=[T(13); T(14); T(15); eul(1); eul(2); eul(3)];
+xe=[T(13); T(14); T(15); rpy(1); rpy(2); rpy(3)];
 xe=eval(xe);
 end
 
