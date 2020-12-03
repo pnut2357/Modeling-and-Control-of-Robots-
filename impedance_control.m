@@ -1,4 +1,5 @@
-function [xe] = impedance_control(he,xd,Arm,Im,Il,Mm,Ml,J,k,g0eom,dh_syms,t0, tf, FB, Fpos, Fneg)
+function impedance_control(he,xd,Arm,Im,Il,Mm,Ml,J,k,g0eom,dh_syms,t0, tf, FB, Fpos, Fneg)
+                
 %{
 Inputs:
 Special inputs:
@@ -26,8 +27,13 @@ G: the n x 1 matrix of gravity effects
 [B,C,G] = EOMFinder(Arm,Im,Il,Mm,Ml,J,k,g0eom,dh_syms);
 n=size(B,1);
 q0=zeros(n,1);
-q0
-
+% B
+% C
+% G
+% q0
+% he
+xd
+% Arm
 %initialize q and dq
 % q = Simulink.Signal;
 % q.CoderInfo.StorageClass = 'ExportedGlobal';
@@ -42,7 +48,8 @@ q0
 % dh_calc = dh_syms(:);
 
 timespan=linspace(t0, tf, (tf-t0)*100);
-% xe=sim('Force_control_compliance',timespan) %Simulate the model
+xe=1;
+sim('test',timespan) %Simulate the model
 %plot xe, xd and he in AppDesigner
 end
 
