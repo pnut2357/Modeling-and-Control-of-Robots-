@@ -25,6 +25,7 @@ format long
 assume(q,'real');
 assume(qd,'real');
 assume(qdd,'real');
+assume(he,'real');
 n=Arm.n;
 %Get DH parameters and offset
 a=(dh_syms(:,3))';
@@ -161,10 +162,11 @@ T=[cos(theta),-sin(theta)*cos(alpha),sin(theta)*sin(alpha),a*cos(theta);
     0,sin(alpha),cos(alpha),d;
     0,0,0,1];
 end
-%% Calculate F: NEEDS TO BE DOUBLE CHECKED BASED ON HOW INPUTS LOOK
-
-Fc=Arm.Tc;
-Fb=Arm.B.*abs(qd);
+%% Calculate F
+for i=1:n
+    Fc(i,:)=Arm.links(i).Tc;
+    Fb(i,1)=Arm.links(i).B*abs(qd(i));
+end
 Fpos=Fc(:,1)+Fb;
 Fneg=Fc(:,2)-Fb;
 %% Calculate Je
@@ -190,8 +192,8 @@ Je=simplify(Je);
 
 disp('For positive Joint velocities')
 disp('u=')
-Full_EOMpos=B*qdd+C*qd+Fpos*qd+G+Je'*he
+Full_EOMpos=B*qdd'+C*qd'+Fpos+G+Je'*he
 disp('For negative Joint velocities')
 disp('u=')
-Full_EOMneg=B*qdd+C*qd+Fneg*qd+G+Je'*he
+Full_EOMneg=B*qdd'+C*qd'+Fneg+G+Je'*he
 end
