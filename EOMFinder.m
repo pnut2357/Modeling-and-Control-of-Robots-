@@ -1,4 +1,4 @@
-function [B,C,G,Je,Fpos,Fneg,Arm,Full_EOMpos,Full_EOMneg] = EOMFinder(Arm,Im,Il,Mm,Ml,J,k,g0,dh_syms,he)
+function [B,C,G,Je,Fpos,Fneg,Full_EOMpos,Full_EOMneg] = EOMFinder(Arm,Im,Il,Mm,Ml,J,k,g0,dh_syms,he)
 %{
 Inputs:
 Arm: the Serial Link form of the robotic arm in question
