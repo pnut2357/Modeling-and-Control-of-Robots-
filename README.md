@@ -1,5 +1,12 @@
 # Modeling-and-Control-of-Robots-
 
+## How to run the GUI Robotics Tool:
+1. Download the zip of "Final Project - Team 1.zip" and Unzip it in your directory. 
+2. Open "OPEN_THIS_RoboticsPackage.mlapp"
+The instructions for user manual are shown below. 
+
+NOTE: MATLAB should be installed to run the GUI Simulator. 
+
 ![0002](https://user-images.githubusercontent.com/20247211/101235896-a9ac6880-3689-11eb-94ff-1c00902280cc.jpg)
 
 ![0004](https://user-images.githubusercontent.com/20247211/101235904-c21c8300-3689-11eb-9f11-1d8316df4f31.jpg)
