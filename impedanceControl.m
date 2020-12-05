@@ -56,20 +56,20 @@ x_dtilda = xd_dot - xe_dot;
 x_ddtilda = xd_ddot - xe_ddot;
 error_Data = [norm(xtilda)];
 % Perform loop
-while norm(xtilda) > 0.01
+while norm(xtilda) > 0.1
     % Go through the loop up to the manipulator:
     if counter == 233
         test = 3;
     end
-    s = kp*xtilda + kd*x_dtilda + Md*x_ddtilda
-    s = inv(Md)*s
-    s = pinv(Ja)*s
-    s = B*s
-    u = s+n
+    s = kp*xtilda + kd*x_dtilda + Md*x_ddtilda;
+    s = inv(Md)*s;
+    s = pinv(Ja)*s;
+    s = B*s;
+    u = s+n;
     
     % Put u into the manipulator and get q, qdot:
     s = u - (Arm.jacob0(q))'*he
-    qddot = inv(B)*(G+C*qdot+F+s)
+    qddot = inv(B)*(-G-C*qdot-F+s)
     qdot = qdot + dt*qddot
     q = q + dt*qdot
     
