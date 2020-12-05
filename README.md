@@ -1,5 +1,4 @@
 # Modeling-and-Control-of-Robots-
-![0001](https://user-images.githubusercontent.com/20247211/101235870-6d790800-3689-11eb-9b13-867920c26d3b.jpg)
 
 ![0002](https://user-images.githubusercontent.com/20247211/101235896-a9ac6880-3689-11eb-94ff-1c00902280cc.jpg)
 
